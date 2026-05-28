@@ -11,19 +11,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Locate Android project
-        id: locate
-        shell: bash
-        run: |
-          PROJECT_DIR="$(find . -maxdepth 3 -name settings.gradle -print -quit | xargs dirname)"
-          if [ -z "$PROJECT_DIR" ]; then
-            echo "Cannot find settings.gradle"
-            find . -maxdepth 4 -type f
-            exit 1
-          fi
-          echo "dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
-          echo "Found Android project at $PROJECT_DIR"
-
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -39,10 +26,10 @@ jobs:
           gradle-version: "8.7"
 
       - name: Build debug APK
-        run: gradle -p "${{ steps.locate.outputs.dir }}" assembleDebug
+        run: gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: weibo-chaohua-viewer-debug-apk
-          path: ${{ steps.locate.outputs.dir }}/app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
